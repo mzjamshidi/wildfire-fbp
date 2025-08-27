@@ -63,7 +63,6 @@ def _rsi_formula(
     """Eq. 26, FCFDG 1992: Initial rate of spread (RSI)"""
     return a * (1 - np.exp(-b * isi)) ** c
 
-
 def initial_rate_of_spread(
         fuel_map: np.ndarray,
         isi: np.ndarray,
@@ -134,7 +133,6 @@ def initial_rate_of_spread(
         a, b, c = _get_ros_params_m4(pdf)
 
         rsi[mask] = _rsi_formula(isi[mask], a, b, c)
-
     return rsi
 
 
@@ -160,7 +158,6 @@ def initial_spread_index(ffmc: np.ndarray, ws: np.ndarray) -> np.ndarray:
 
     """Eq. 52, FCFDG 1992"""
     isi = 0.208 * fW * fF
-
     return isi
 
 def buildup_effect(fuel_map: np.ndarray, bui: np.ndarray) -> np.ndarray:
@@ -172,11 +169,11 @@ def buildup_effect(fuel_map: np.ndarray, bui: np.ndarray) -> np.ndarray:
         q = param["q"]
 
         """Eq. 54, FCFDG 1992: Buildup effect"""
-        be[mask] = np.exp(50 * np.log(q) * (1/bui[mask] - 1/BUI0))
-    
+        be[mask] = np.exp(50 * np.log(q) * (1/bui[mask] - 1/BUI0)) 
     return be
 
-def rate_of_spread(rsi: np.ndarray, be) -> np.ndarray:
+def rate_of_spread(rsi: np.ndarray, be: np.ndarray) -> np.ndarray:
     """Eq. 55, FCFDG 1992: Rate of spread (ROS)"""
     ros = np.maximum(rsi * be, 1e-6)   
     return ros
+    

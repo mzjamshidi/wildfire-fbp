@@ -4,20 +4,41 @@ from fbp import FBP_FUEL_MAP
 
 """Table 6, FCFDG 1992: Rate of spread parameters for all fuel types (except mixedwood)"""
 ROS_PARAMS = {
-        "C1" : {"a": 90 , "b": 0.0649, "c": 4.5},
-        "C2" : {"a": 110, "b": 0.0282, "c": 1.5},
-        "C3" : {"a": 110, "b": 0.0444, "c": 3.0},
-        "C4" : {"a": 110, "b": 0.0293, "c": 1.5},
-        "C5" : {"a": 30 , "b": 0.0697, "c": 4.0},
-        "C6" : {"a": 30 , "b": 0.0800, "c": 3.0},
-        "C7" : {"a": 45 , "b": 0.0305, "c": 2.0},
-        "D1" : {"a": 30 , "b": 0.0232, "c": 1.6},
-        "S1" : {"a": 75 , "b": 0.0297, "c": 1.3},
-        "S2" : {"a": 40 , "b": 0.0438, "c": 1.7},
-        "S3" : {"a": 55 , "b": 0.0829, "c": 3.2},
-        "O1a": {"a": 190, "b": 0.0310, "c": 1.4},
-        "O1b": {"a": 250, "b": 0.0350, "c": 1.7},
+    "C1" : {"a": 90 , "b": 0.0649, "c": 4.5},
+    "C2" : {"a": 110, "b": 0.0282, "c": 1.5},
+    "C3" : {"a": 110, "b": 0.0444, "c": 3.0},
+    "C4" : {"a": 110, "b": 0.0293, "c": 1.5},
+    "C5" : {"a": 30 , "b": 0.0697, "c": 4.0},
+    "C6" : {"a": 30 , "b": 0.0800, "c": 3.0},
+    "C7" : {"a": 45 , "b": 0.0305, "c": 2.0},
+    "D1" : {"a": 30 , "b": 0.0232, "c": 1.6},
+    "S1" : {"a": 75 , "b": 0.0297, "c": 1.3},
+    "S2" : {"a": 40 , "b": 0.0438, "c": 1.7},
+    "S3" : {"a": 55 , "b": 0.0829, "c": 3.2},
+    "O1a": {"a": 190, "b": 0.0310, "c": 1.4},
+    "O1b": {"a": 250, "b": 0.0350, "c": 1.7},
     }
+
+"""Table 7, FCFDG 1992: Values of BUI0, q, and maximum BE for each fuel type"""
+BUILTUP_PARAMS = {
+    "C1": {"BUI0": 72  , "q": 0.90, "MaxBE": 1.076},
+    "C2": {"BUI0": 64  , "q": 0.70, "MaxBE": 1.321},
+    "C3": {"BUI0": 62  , "q": 0.75, "MaxBE": 1.261},
+    "C4": {"BUI0": 66  , "q": 0.80, "MaxBE": 1.184},
+    "C5": {"BUI0": 56  , "q": 0.80, "MaxBE": 1.220},
+    "C6": {"BUI0": 62  , "q": 0.80, "MaxBE": 1.197},
+    "C7": {"BUI0": 106 , "q": 0.85, "MaxBE": 1.134},
+    "D1": {"BUI0": 32  , "q": 0.90, "MaxBE": 1.179},
+    "M1": {"BUI0": 50  , "q": 0.80, "MaxBE": 1.250},
+    "M2": {"BUI0": 50  , "q": 0.80, "MaxBE": 1.250},
+    "M3": {"BUI0": 50  , "q": 0.80, "MaxBE": 1.250},
+    "M4": {"BUI0": 50  , "q": 0.80, "MaxBE": 1.250},
+    "S1": {"BUI0": 38  , "q": 0.75, "MaxBE": 1.460},
+    "S2": {"BUI0": 63  , "q": 0.75, "MaxBE": 1.256},
+    "S3": {"BUI0": 31  , "q": 0.75, "MaxBE": 1.590},
+    "O1a": {"BUI0": None, "q": 1.00, "MaxBE": 1.000},
+    "O1b": {"BUI0": None, "q": 1.00, "MaxBE": 1.000},
+}
 
 def _get_ros_params_m3(pdf: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Eqs. 29, 30 & 31, FCFDG 1992"""
@@ -143,36 +164,14 @@ def initial_spread_index(ffmc: np.ndarray, ws: np.ndarray) -> np.ndarray:
     return isi
 
 def buildup_effect(fuel_map: np.ndarray, bui: np.ndarray) -> np.ndarray:
-
-    # Table 7, FCFDG 1992: Values of BUI0, q, and maximum BE for each fuel type
-    params = {
-        "C1": {"BUI0": 72  , "q": 0.90, "MaxBE": 1.076},
-        "C2": {"BUI0": 64  , "q": 0.70, "MaxBE": 1.321},
-        "C3": {"BUI0": 62  , "q": 0.75, "MaxBE": 1.261},
-        "C4": {"BUI0": 66  , "q": 0.80, "MaxBE": 1.184},
-        "C5": {"BUI0": 56  , "q": 0.80, "MaxBE": 1.220},
-        "C6": {"BUI0": 62  , "q": 0.80, "MaxBE": 1.197},
-        "C7": {"BUI0": 106 , "q": 0.85, "MaxBE": 1.134},
-        "D1": {"BUI0": 32  , "q": 0.90, "MaxBE": 1.179},
-        "M1": {"BUI0": 50  , "q": 0.80, "MaxBE": 1.250},
-        "M2": {"BUI0": 50  , "q": 0.80, "MaxBE": 1.250},
-        "M3": {"BUI0": 50  , "q": 0.80, "MaxBE": 1.250},
-        "M4": {"BUI0": 50  , "q": 0.80, "MaxBE": 1.250},
-        "S1": {"BUI0": 38  , "q": 0.75, "MaxBE": 1.460},
-        "S2": {"BUI0": 63  , "q": 0.75, "MaxBE": 1.256},
-        "S3": {"BUI0": 31  , "q": 0.75, "MaxBE": 1.590},
-        "O1a": {"BUI0": None, "q": 1.00, "MaxBE": 1.000},
-        "O1b": {"BUI0": None, "q": 1.00, "MaxBE": 1.000},
-    }
-
     be = np.zeros_like(fuel_map, dtype=float)
-    for fuel, param in params.items():
+    for fuel, param in BUILTUP_PARAMS.items():
         mask = fuel_map == FBP_FUEL_MAP[fuel]
 
         BUI0 = param["BUI0"]
         q = param["q"]
 
-        # Eq. 54, FCFDG 1992: Buildup effect
+        """Eq. 54, FCFDG 1992: Buildup effect"""
         be[mask] = np.exp(50 * np.log(q) * (1/bui[mask] - 1/BUI0))
     
     return be

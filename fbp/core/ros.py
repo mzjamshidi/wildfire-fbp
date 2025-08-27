@@ -48,7 +48,7 @@ def initial_rate_of_spread(
         isi: np.ndarray,
         percent_grass_curing_map: np.ndarray | None = None,
         percent_conifer_map: np.ndarray | None = None,
-        percent_dead_balsam_fir: np.ndarray | None = None) -> np.ndarray:
+        percent_dead_fir_map: np.ndarray | None = None) -> np.ndarray:
         
     rsi = np.full_like(fuel_map, np.nan, dtype=float)
 
@@ -62,7 +62,7 @@ def initial_rate_of_spread(
 
         if fuel in ("O1a", "O1b"):
             if percent_grass_curing_map is None:
-                raise ValueError(f"Grass curing map required for {fuel}")
+                raise ValueError(f"percent_grass_curing_map required for {fuel} (cells: {np.sum(mask)})")
             
             gc = percent_grass_curing_map[mask]
             
@@ -82,7 +82,7 @@ def initial_rate_of_spread(
             continue
 
         if percent_conifer_map is None:
-            raise ValueError("percent_conifer_map required for mixedwood fuels")
+            raise ValueError(f"percent_conifer_map required for {fuel} (cells: {np.sum(mask)})")
             
         pc = percent_conifer_map[mask]
 
@@ -95,10 +95,10 @@ def initial_rate_of_spread(
     # --- mixedwood M3 ---
     mask = fuel_map == FBP_FUEL_MAP["M3"]
     if np.any(mask):
-        if percent_dead_balsam_fir is None:
-            raise ValueError("percet_dead_balsam_fir required for mixedwood fuels")
+        if percent_dead_fir_map is None:
+            raise ValueError(f"percent_dead_fir_map required for M3 (cells: {np.sum(mask)})")
         
-        pdf = percent_dead_balsam_fir[mask]
+        pdf = percent_dead_fir_map[mask]
         a, b, c = _get_ros_params_m3(pdf)
 
         rsi[mask] = _rsi_formula(isi[mask], a, b, c)
@@ -106,10 +106,10 @@ def initial_rate_of_spread(
     # --- mixedwood M4 ---
     mask = fuel_map == FBP_FUEL_MAP["M4"]
     if np.any(mask):
-        if percent_dead_balsam_fir is None:
-            raise ValueError("percet_dead_balsam_fir required for mixedwood fuels")
+        if percent_dead_fir_map is None:
+            raise ValueError(f"percent_dead_fir_map required for M4 (cells: {np.sum(mask)})")
         
-        pdf = percent_dead_balsam_fir[mask]
+        pdf = percent_dead_fir_map[mask]
         a, b, c = _get_ros_params_m4(pdf)
 
         rsi[mask] = _rsi_formula(isi[mask], a, b, c)
@@ -118,20 +118,26 @@ def initial_rate_of_spread(
 
 
 def initial_spread_index(ffmc: np.ndarray, ws: np.ndarray) -> np.ndarray:
-    
+    """
+        ws: wind speed (km/h)
+    """
     wsv = ws    # FIXME this probably not correct.
     FFMC_COEFFICIENT = 250 * 59.5 / 101
     
-    # Eq. 46, FCFDG 1992
+    """Eq. 46, FCFDG 1992"""
     m = FFMC_COEFFICIENT * (101 - ffmc) / (59.5 + ffmc)
 
-    # Eq. 45, FCFDG 1992
+    """Eq. 45, FCFDG 1992"""
     fF = 91.9 * np.exp(-0.1386 * m) * (1 + (m**5.31) / 4.93e7)
     
-    # Eq. 53, FCFDG 1992: wsv: net effective wind speed
-    fW = np.exp(0.05039 * wsv)
+    """Eqs. 53 & 53a, FCFDG 1992: wsv: net effective wind speed"""
+    fW = np.where(
+        wsv <= 40,
+        np.exp(0.05039 * wsv),
+        12 * (1 - np.exp(-0.0818 * (wsv - 28)))
+    )
 
-    # Eq. 52, FCFDG 1992    
+    """Eq. 52, FCFDG 1992"""
     isi = 0.208 * fW * fF
 
     return isi

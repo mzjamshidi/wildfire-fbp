@@ -150,15 +150,14 @@ def initial_spread_index(ffmc: np.ndarray, ws: np.ndarray) -> np.ndarray:
     """
         ws: wind speed (km/h)
     """
-    wsv = ws    # FIXME this probably not correct.
 
     fF = _fF_formula(ffmc)
     
     """Eqs. 53 & 53a, FCFDG 1992: wsv: net effective wind speed"""
     fW = np.where(
-        wsv <= 40,
-        np.exp(0.05039 * wsv),
-        12 * (1 - np.exp(-0.0818 * (wsv - 28)))
+        ws <= 40,
+        np.exp(0.05039 * ws),
+        12 * (1 - np.exp(-0.0818 * (ws - 28)))
     )
 
     """Eq. 52, FCFDG 1992"""

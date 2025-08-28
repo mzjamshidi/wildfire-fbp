@@ -63,6 +63,15 @@ def _rsi_formula(
     """Eq. 26, FCFDG 1992: Initial rate of spread (RSI)"""
     return a * (1 - np.exp(-b * isi)) ** c
 
+def _cf_formula(gc: np.ndarray):
+    """Eqs. 35(a&b), Wotton et al. 2009 : Revised grass curing coefficient"""
+    return np.where(
+                gc < 58.8,
+                0.005 * (np.exp(0.061 * gc) - 1),
+                0.176 + 0.02 * (gc - 58.8)
+            )
+    
+
 def initial_rate_of_spread(
         fuel_map: np.ndarray,
         isi: np.ndarray,
@@ -85,15 +94,7 @@ def initial_rate_of_spread(
                 raise ValueError(f"percent_grass_curing_map required for {fuel} (cells: {np.sum(mask)})")
             
             gc = percent_grass_curing_map[mask]
-            
-            """Eqs. 35(a&b), Wotton et al. 2009 : Revised grass curing coefficient"""
-            cf = np.where(
-                        gc < 58.8,
-                        0.005 * (np.exp(0.061 * gc) - 1),
-                        0.176 + 0.02 * (gc - 58.8)
-                    )
-            
-            rsi[mask] *= cf      
+            rsi[mask] *= _cf_formula(gc)      
     
     # --- mixedwood M1/M2 ---
     for fuel, dec_factor in zip(("M1", "M2"), (1.0, 0.2)):

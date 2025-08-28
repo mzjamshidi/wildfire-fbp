@@ -7,6 +7,7 @@ setup(
     packages=find_packages(exclude=("data",)),
     install_requires=[
         "numpy",
-        "rasterio"
+        "scikit-image",
+        "rasterio",
     ]
 )

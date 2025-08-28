@@ -169,7 +169,9 @@ def buildup_effect(fuel_map: np.ndarray, bui: np.ndarray) -> np.ndarray:
         q = param["q"]
 
         """Eq. 54, FCFDG 1992: Buildup effect"""
-        be[mask] = np.exp(50 * np.log(q) * (1/bui[mask] - 1/BUI0)) 
+        be[mask] = np.where((bui[mask] > 0) & (BUI0 > 0),
+                            np.exp(50 * np.log(q) * (1/bui[mask] - 1/BUI0)),
+                            1)
     return be
 
 def rate_of_spread(rsi: np.ndarray, be: np.ndarray) -> np.ndarray:

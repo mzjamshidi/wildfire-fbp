@@ -128,21 +128,32 @@ def initial_rate_of_spread(
         if percent_dead_fir_map is None:
             raise ValueError(f"percent_dead_fir_map required for M3 (cells: {np.sum(mask)})")
         
+        """Eq. 30, Wotton 2009"""
+        rsi_m3_100 = 120 * (1 - np.exp(-0.0572 * isi[mask])) ** 1.4   
         pdf = percent_dead_fir_map[mask]
-        a, b, c = _get_ros_params_m3(pdf)
+        pdf_safe = np.maximum(pdf, 1e-6)
 
-        rsi[mask] = _rsi_formula(isi[mask], a, b, c)
-    
+        rsi_d1 = _rsi_formula(isi[mask], **ROS_PARAMS["D1"])
+        
+        """Eq. 29, Wotton 2009"""
+        rsi[mask] = pdf_safe/100 * rsi_m3_100 + (1 - pdf_safe/100) * rsi_d1
+
     # --- mixedwood M4 ---
     mask = fuel_map == FBP_FUEL_MAP["M4"]
     if np.any(mask):
         if percent_dead_fir_map is None:
             raise ValueError(f"percent_dead_fir_map required for M4 (cells: {np.sum(mask)})")
         
+        """Eq. 32, Wotton 2009"""
+        rsi_m4_100 = 100 * (1 - np.exp(-0.0404 * isi[mask])) ** 1.48   
         pdf = percent_dead_fir_map[mask]
-        a, b, c = _get_ros_params_m4(pdf)
+        pdf_safe = np.maximum(pdf, 1e-6)
 
-        rsi[mask] = _rsi_formula(isi[mask], a, b, c)
+        rsi_d1 = _rsi_formula(isi[mask], **ROS_PARAMS["D1"])
+
+        """Eq. 31, Wotton 2009"""
+        rsi[mask] = pdf_safe/100 * rsi_m4_100 + (1 - pdf_safe/100) * rsi_d1
+
     return rsi
 
 
@@ -171,11 +182,15 @@ def buildup_effect(fuel_map: np.ndarray, bui: np.ndarray) -> np.ndarray:
 
         BUI0 = param["BUI0"]
         q = param["q"]
+        if BUI0 is not None:
 
-        """Eq. 54, FCFDG 1992: Buildup effect"""
-        be[mask] = np.where((bui[mask] > 0) & (BUI0 > 0),
-                            np.exp(50 * np.log(q) * (1/bui[mask] - 1/BUI0)),
-                            1)
+            """Eq. 54, FCFDG 1992: Buildup effect"""
+            be[mask] = np.where((bui[mask] > 0) & (BUI0 > 0),
+                                np.exp(50 * np.log(q) * (1/bui[mask] - 1/BUI0)),
+                                1)
+        else:
+            be[mask] = 1
+
     return be
 
 def rate_of_spread(rsi: np.ndarray, be: np.ndarray) -> np.ndarray:

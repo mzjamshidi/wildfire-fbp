@@ -87,7 +87,9 @@ def initial_rate_of_spread(
         percent_grass_curing_map: np.ndarray | None = None,
         percent_conifer_map: np.ndarray | None = None,
         percent_dead_fir_map: np.ndarray | None = None) -> np.ndarray:
-        
+    
+    # FIXME C-6 isn't implemented.
+    
     rsi = np.full_like(fuel_map, np.nan, dtype=float)
 
     # --- standard fuels ---
@@ -153,6 +155,11 @@ def initial_rate_of_spread(
 
         """Eq. 31, Wotton 2009"""
         rsi[mask] = pdf_safe/100 * rsi_m4_100 + (1 - pdf_safe/100) * rsi_d1
+    
+    # -- C6 ---
+    mask = fuel_map == FBP_FUEL_MAP["C6"]
+    if np.any(mask):
+        raise NotImplementedError
 
     return rsi
 

@@ -204,22 +204,14 @@ def crown_fuel_consumption(
 
 def total_fuel_consumption(
         fuel_map: np.ndarray,
-        bui: np.ndarray,
+        surface_fuel_consumption: np.ndarray,
         crown_fraction_burned: np.ndarray,
-        grass_fuel_load: float = 0.3,
         crown_fuel_load: np.ndarray | None = None,
-        ffmc: np.ndarray | None = None,
         percent_conifer_map: np.ndarray | None = None,
         percent_dead_fir_map: np.ndarray | None = None
 ):
     
-    sfc = surface_fuel_consumption(fuel_map=fuel_map,
-                                   bui=bui,
-                                   ffmc=ffmc,
-                                   percent_conifer_map=percent_conifer_map,
-                                   grass_fuel_load=grass_fuel_load)
-    
-    tfc = sfc
+    tfc = surface_fuel_consumption
     if np.any(get_fuel_mask(fuel_map, CROWNING_FUELS)):
         cfc = crown_fuel_consumption(fuel_map,
                                     crown_fraction_burned,

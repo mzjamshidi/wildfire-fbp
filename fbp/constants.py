@@ -17,6 +17,7 @@ FBP_FUEL_MAP = {
     "M2" : 50,
     "M3" : 70,
     "M4" : 80,
+    "Non-fuel": 0
 }
 
 # Table 2, FCFDG 1992: FBP fuel types
@@ -38,12 +39,27 @@ FBP_FUEL_DESC = {
     "S3" : "Coastal cedar—hemlock—Douglas-fir slash",
     "O1a": "Grass—matted",          # section 4.2.5
     "O1b": "Grass—standing dead",   # section 4.2.5
+    "Non-fuel": "Non-fuel"
 }
 
 # FBPFuelType symbology (Excel file) TODO complete
 FBP_FUEL_COLOR = {
     "C1" : (209, 255, 115), 
-    "C2" : (34, 102),
+    "C2" : (34, 102, 51),
     "C3" : (131, 199, 149),
     "C4" : (112, 168, 0),
+    "C5" : (223, 184, 230),
+    "C6" : (172, 102, 237),
+    "C7" : (112, 12, 242),
+    "D1" : (196, 189, 151),
+    "S1" : (251, 190, 185),
+    "S2" : (247, 104, 161),
+    "S3" : (174, 1, 126),
+    "O1a": (255, 255, 190),
+    "O1b": (230, 230, 0),
+    "M1" : (255, 211, 127),
+    "M2" : (255, 170, 0),
+    "M3" : (99, 0, 0),
+    "M4" : (170, 0, 0),
+    "Non-fuel": (0, 0, 0)
 }

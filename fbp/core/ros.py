@@ -1,6 +1,6 @@
 import numpy as np
 
-from fbp import FBP_FUEL_MAP
+from fbp.constants import FBP_FUEL_MAP
 
 """Table 6, FCFDG 1992: Rate of spread parameters for all fuel types (except mixedwood)"""
 ROS_PARAMS = {

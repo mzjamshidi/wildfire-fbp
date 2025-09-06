@@ -1,6 +1,6 @@
 import numpy as np
 
-from fbp import FBP_FUEL_MAP
+from fbp.constants import FBP_FUEL_MAP
 from .ros import (
     initial_rate_of_spread,
     initial_spread_index,

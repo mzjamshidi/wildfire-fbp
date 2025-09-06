@@ -1,6 +1,6 @@
 import numpy as np
 
-from fbp import FBP_FUEL_MAP
+from fbp.constants import FBP_FUEL_MAP
 from fbp.core.utils import get_fuel_mask
 from fbp.core.crowning import crown_fraction_burned
 

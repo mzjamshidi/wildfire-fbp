@@ -3,7 +3,7 @@ from typing import Self
 import numpy as np
 from skimage import measure, morphology
 
-from fbp import FBP_FUEL_MAP
+from fbp.constants import FBP_FUEL_MAP
 
 DECIDUOUS_FUEL_CODES = [code for fuel, code in FBP_FUEL_MAP.items() if fuel.startswith("D")]
 CONIFER_FUEL_CODES = [code for fuel, code in FBP_FUEL_MAP.items() if fuel.startswith("C")]

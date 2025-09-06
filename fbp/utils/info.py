@@ -1,4 +1,4 @@
-from fbp import FBP_FUEL_DESC
+from fbp.constants import FBP_FUEL_DESC
 
 def describe_fbp_fuel_types():
     print("="*50)

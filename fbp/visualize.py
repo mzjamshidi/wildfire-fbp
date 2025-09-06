@@ -24,7 +24,7 @@ def plot_fuel_consumption(results: FBPResults):
     cbar = fig.colorbar(im)
     plt.show()
 
-def plot_fuel_map(fuel_map: np.ndarray):
+def plot_fuel_map(fuel_map: np.ndarray, extent=None):
     from matplotlib.colors import ListedColormap,BoundaryNorm
     from .constants import FBP_FUEL_COLOR, FBP_FUEL_MAP, FBP_FUEL_DESC
 
@@ -42,7 +42,7 @@ def plot_fuel_map(fuel_map: np.ndarray):
     colors = [COLOR_MAP[c] for c in classes]
 
     fig, ax = plt.subplots()
-    im = ax.imshow(vectorized_map, cmap=ListedColormap(colors), norm=norm)
+    im = ax.imshow(vectorized_map, cmap=ListedColormap(colors), norm=norm, extent=extent)
     cbar = fig.colorbar(im, ticks=np.arange(len(classes)))
     cbar.ax.set_yticklabels([f"{FUEL_ID_TO_CODE[f]}" for f in classes])
 

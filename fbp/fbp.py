@@ -11,6 +11,7 @@ from .core.crowning import crown_fraction_burned
 
 @dataclass
 class FBPResults:
+    fuel: np.ndarray
     cfb: np.ndarray
     # cfc: np.ndarray
     # fd: np.ndarray
@@ -104,6 +105,7 @@ class FBP:
         hfi = fire_intensity(fc=tfc, ros=ros)
 
         results = FBPResults(
+            fuel=self.fuel_map,
             ros=ros,
             raz=raz,
             sfc=sfc,

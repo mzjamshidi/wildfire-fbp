@@ -21,7 +21,7 @@ def critical_surface_fire_rate_of_spread(csi, sfc):
 def crown_fraction_burned(rate_of_spread: np.ndarray,
                           folier_moisture_content: np.ndarray,
                           surface_fuel_consumption: np.ndarray,
-                          crown_base_height: np.ndarray | int) -> np.ndarray:
+                          crown_base_height: np.ndarray | float) -> np.ndarray:
 
     csi = critical_surface_fire_intensity(folier_moisture_content, crown_base_height)
     rso = critical_surface_fire_rate_of_spread(csi, sfc=surface_fuel_consumption)

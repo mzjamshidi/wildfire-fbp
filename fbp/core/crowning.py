@@ -44,7 +44,7 @@ def classify_fire_type(fuel_map: np.ndarray, cfb:np.ndarray | None) -> np.ndarra
     FD = np.full_like(fuel_map, "Null", dtype="<U4")
     
 
-    mask_surface = get_fuel_mask(fuel_map, ["D1", "D2", "O1a", "O1b"])
+    mask_surface = get_fuel_mask(fuel_map, ["D1", "O1a", "O1b"])
     if np.any(mask_surface):
         FD[mask_surface] = "S"
     

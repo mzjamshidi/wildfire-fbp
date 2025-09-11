@@ -6,7 +6,7 @@ import numpy as np
 from .core.ros import rate_of_spread, initial_rate_of_spread, initial_spread_index, buildup_effect
 from .core.slope import slope_adjusted_wind_vector
 from .core.consumption import total_fuel_consumption, surface_fuel_consumption, fire_intensity
-from .core.crowning import crown_fraction_burned 
+from .core.crowning import crown_fraction_burned, classify_fire_type
 
 
 @dataclass
@@ -14,7 +14,7 @@ class FBPResults:
     fuel: np.ndarray
     cfb: np.ndarray
     # cfc: np.ndarray
-    # fd: np.ndarray
+    fd: np.ndarray
     hfi: np.ndarray
     raz: np.ndarray
     ros: np.ndarray
@@ -104,6 +104,8 @@ class FBP:
 
         hfi = fire_intensity(fc=tfc, ros=ros)
 
+        fd = classify_fire_type(fuel_map=self.fuel_map, cfb=cfb)
+
         results = FBPResults(
             fuel=self.fuel_map,
             ros=ros,
@@ -111,7 +113,8 @@ class FBP:
             sfc=sfc,
             cfb=cfb,
             tfc=tfc,
-            hfi=hfi
+            hfi=hfi,
+            fd=fd
         )
         
         return results

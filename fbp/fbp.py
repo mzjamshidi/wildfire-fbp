@@ -64,8 +64,8 @@ class FBP:
 
         wsv, raz = slope_adjusted_wind_vector(
             fuel_map=self.fuel_map,
-            wind_speed=self._to_array(wind_speed),
-            wind_azimuth=self._to_array(wind_azimuth),
+            wind_speed=self._wind_speed,
+            wind_azimuth=self._wind_azimuth,
             slope_percent=self.slope_percent,
             slope_azimuth=self.slope_azimuth,
             ffmc=self._ffmc,
@@ -74,7 +74,7 @@ class FBP:
             percent_grass_curing_map=self._percent_grass_curing
         )
 
-        isi = initial_spread_index(ffmc=self._ffmc, ws=self._wind_speed)
+        isi = initial_spread_index(ffmc=self._ffmc, ws=wsv)
         rsi = initial_rate_of_spread(self.fuel_map, isi, self._percent_grass_curing, self.percent_conifer)
 
         be = buildup_effect(self.fuel_map, bui=self._bui)

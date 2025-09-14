@@ -137,8 +137,13 @@ class Layer:
 
         print(f"Layer resized from ({src_height}, {src_width}) to ({dst_height}, {dst_width})")
         
-    def save(self):
-        raise NotImplemented
+    def save(self, path):
+        if path.lower().endswith(("tiff", "tif")):
+            with rasterio.open(path, "w", **self.meta) as dst:
+                dst.write(self._data)
+        else:
+            raise ValueError("Only .tif or .tiff files are supported.")
+        
 
     def __call__(self) -> np.ndarray:
         return self.data.copy()
@@ -184,4 +189,3 @@ class ChildLayer(Layer):
         })
 
         super().__init__(data=data, meta=meta)
-        

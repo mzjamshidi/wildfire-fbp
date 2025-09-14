@@ -7,7 +7,7 @@
 ## Key Features
 
 - Vectorized implementation with **NumPy** for fast calculations.
-- Python-native interface for integration with GIS, remote sensing, or modeling workflows.
+- Python-native interface for integration with GIS, remote sensing, or AI-driven modeling workflows.
 - Consistent with the original **Canadian Forest Fire Weather Index System**.
 
 ---

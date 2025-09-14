@@ -1,6 +1,6 @@
 # wildfire-fbp
 
-`wildfire-fbp` is a **Python implementation of the Fire Behavior Prediction (FBP) system**, inspired by the R package [cffdrs](https://github.com/cffdrs/cffdrs_r). It provides tools to calculate **fire danger indices**, making it suitable for wildfire risk assessment and research.
+`wildfire-fbp` is a **Python implementation of the Fire Behavior Prediction (FBP) system**, inspired by the R package [cffdrs](https://github.com/cffdrs/cffdrs_r), developed by **Natural Resources Canada (NRCan)**. It provides tools to calculate **fire danger indices**, making it suitable for wildfire risk assessment and research.
 
 ---
 

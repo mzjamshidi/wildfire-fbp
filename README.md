@@ -20,3 +20,11 @@ Clone this repository to your local machine:
 git clone https://github.com/mzjamshidi/wildfire-fbp.git
 cd wildfire-fbp
 ```
+
+---
+
+## References
+
+- Forestry Canada Fire Danger Group. (1992). *Development and Structure of the Canadian Forest Fire Behavior Prediction System*. Ottawa: Forestry Canada.  
+- Van Wagner, C. E., & Pickett, T. L. (1985). *Equations and FORTRAN Program for the Canadian Forest Fire Weather Index System*. Chalk River, Ontario: Canadian Forestry Service.  
+- Wang, X., Wotton, B. M., Cantin, A. S., Parisien, M.-A., Anderson, K., Moore, B., & Flannigan, M. D. (2017). *cffdrs: An R package for the Canadian Forest Fire Danger Rating System*. Ecological Processes. https://doi.org/10.1186/s13717-017-0070-z

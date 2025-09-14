@@ -3,23 +3,23 @@ import numpy as np
 
 from .fbp import FBPResults
 
-def plot_fire_intensity(results: FBPResults):
+def plot_fire_intensity(results: FBPResults, extent=None):
     fig, ax = plt.subplots()
-    im = ax.imshow(results.hfi, cmap="Wistia")
+    im = ax.imshow(results.hfi, cmap="Wistia", extent=extent)
     ax.set_title("Head Fire Intensity (kW/m)")
     cbar = fig.colorbar(im)
     plt.show()
 
-def plot_rate_of_spread(results: FBPResults):
+def plot_rate_of_spread(results: FBPResults, extent=None):
     fig, ax = plt.subplots()
-    im = ax.imshow(results.ros, cmap="Wistia")
+    im = ax.imshow(results.ros, cmap="Wistia", extent=extent)
     ax.set_title("Rate of Spread (m/min)")
     cbar = fig.colorbar(im)
     plt.show()
 
-def plot_fuel_consumption(results: FBPResults):
+def plot_fuel_consumption(results: FBPResults, extent=None):
     fig, ax = plt.subplots()
-    im = ax.imshow(results.tfc, cmap="Wistia")
+    im = ax.imshow(results.tfc, cmap="Wistia", extent=extent)
     ax.set_title(r"Total Fuel Consumption (kg/m$^2$)")
     cbar = fig.colorbar(im)
     plt.show()

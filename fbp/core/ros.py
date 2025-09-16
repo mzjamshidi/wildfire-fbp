@@ -154,7 +154,7 @@ def initial_rate_of_spread(
         rsi_d1 = _rsi_formula(isi[mask], **ROS_PARAMS["D1"])
 
         """Eq. 31, Wotton 2009"""
-        rsi[mask] = pdf_safe/100 * rsi_m4_100 + (1 - pdf_safe/100) * rsi_d1
+        rsi[mask] = pdf_safe/100 * rsi_m4_100 + 0.2 * (1 - pdf_safe/100) * rsi_d1
     
     # -- C6 ---
     mask = fuel_map == FBP_FUEL_MAP["C6"]

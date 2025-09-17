@@ -16,6 +16,7 @@ class FBPResults:
     # cfc: np.ndarray
     fd: np.ndarray
     hfi: np.ndarray
+    wsv: np.ndarray
     raz: np.ndarray
     ros: np.ndarray
     sfc: np.ndarray
@@ -109,6 +110,7 @@ class FBP:
         results = FBPResults(
             fuel=self.fuel_map,
             ros=ros,
+            wsv=wsv,
             raz=raz,
             sfc=sfc,
             cfb=cfb,

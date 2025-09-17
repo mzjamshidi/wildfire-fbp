@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import numpy as np
 
 FFMC_COEFFICIENT = 250.0 * 59.5 / 101.0
@@ -65,3 +67,33 @@ def fine_fuel_moisture_code(ffmc_yesterday: np.ndarray,
     ffmc_today = np.maximum(ffmc_today, 0)
 
     return ffmc_today
+
+def folier_moisture_content(latitude: np.ndarray,
+                            longitude: np.ndarray,
+                            day_of_year: str,
+                            elevation: np.ndarray | None =None) -> np.ndarray:
+      if elevation is None:
+            """Eqs. 1 & 2, FCFDG 1992"""
+            latn = 46 + 23.4 * np.exp(-0.036 * (150 - longitude))
+            d0 = 151 * latitude / latn
+      else:
+    
+            """Eqs. 3 & 4, FCFDG 1992"""
+            latn = 43 + 33.7 * np.exp(-0.0351 * (150 - longitude))
+            d0 = 142.1 * (latitude/latn) + 0.0172 * elevation
+      
+      
+      date = datetime.strptime(day_of_year, "%Y-%m-%d")
+      dj = date.timetuple().tm_yday
+      nd = np.abs(dj - d0)
+
+      fmc = np.full_like(latitude, np.nan, dtype=float)
+      """Eqs. 6, 7 & 8, FCFDG 1992"""
+      cond1 = nd < 30
+      cond2 = (30 <= nd) & (nd <= 50)
+      cond3 = nd > 50
+      fmc[cond1] = 85 + 0.0189 * nd[cond1] ** 2
+      fmc[cond2] = 32.9 + 3.17 * nd[cond2] - 0.0288 * nd[cond2] ** 2
+      fmc[cond3] = 120
+
+      return fmc

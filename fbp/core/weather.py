@@ -73,15 +73,18 @@ def foliar_moisture_content(latitude: np.ndarray,
                             day_of_year: int,
                             elevation: np.ndarray | None =None,
                             d0: np.ndarray | None = None) -> np.ndarray:
+      
+      longitude_west = -longitude
+
       if d0 is None:
             if elevation is None:
                   """Eqs. 1 & 2, FCFDG 1992"""
-                  latn = 46 + 23.4 * np.exp(-0.036 * (150 - longitude))
+                  latn = 46 + 23.4 * np.exp(-0.036 * (150 - longitude_west))
                   d0 = 151 * latitude / latn
             else:
       
                   """Eqs. 3 & 4, FCFDG 1992"""
-                  latn = 43 + 33.7 * np.exp(-0.0351 * (150 - longitude))
+                  latn = 43 + 33.7 * np.exp(-0.0351 * (150 - longitude_west))
                   d0 = 142.1 * (latitude/latn) + 0.0172 * elevation
       
       d0 = np.round(d0, 0)

@@ -68,23 +68,26 @@ def fine_fuel_moisture_code(ffmc_yesterday: np.ndarray,
 
     return ffmc_today
 
-def folier_moisture_content(latitude: np.ndarray,
+def foliar_moisture_content(latitude: np.ndarray,
                             longitude: np.ndarray,
-                            day_of_year: str,
-                            elevation: np.ndarray | None =None) -> np.ndarray:
-      if elevation is None:
-            """Eqs. 1 & 2, FCFDG 1992"""
-            latn = 46 + 23.4 * np.exp(-0.036 * (150 - longitude))
-            d0 = 151 * latitude / latn
-      else:
-    
-            """Eqs. 3 & 4, FCFDG 1992"""
-            latn = 43 + 33.7 * np.exp(-0.0351 * (150 - longitude))
-            d0 = 142.1 * (latitude/latn) + 0.0172 * elevation
+                            day_of_year: int,
+                            elevation: np.ndarray | None =None,
+                            d0: np.ndarray | None = None) -> np.ndarray:
+      if d0 is None:
+            if elevation is None:
+                  """Eqs. 1 & 2, FCFDG 1992"""
+                  latn = 46 + 23.4 * np.exp(-0.036 * (150 - longitude))
+                  d0 = 151 * latitude / latn
+            else:
       
+                  """Eqs. 3 & 4, FCFDG 1992"""
+                  latn = 43 + 33.7 * np.exp(-0.0351 * (150 - longitude))
+                  d0 = 142.1 * (latitude/latn) + 0.0172 * elevation
       
-      date = datetime.strptime(day_of_year, "%Y-%m-%d")
-      dj = date.timetuple().tm_yday
+      d0 = np.round(d0, 0)
+      # date = datetime.strptime(day_of_year, "%Y-%m-%d")
+      # dj = date.timetuple().tm_yday
+      dj = int(day_of_year)
       nd = np.abs(dj - d0)
 
       fmc = np.full_like(latitude, np.nan, dtype=float)
@@ -95,5 +98,6 @@ def folier_moisture_content(latitude: np.ndarray,
       fmc[cond1] = 85 + 0.0189 * nd[cond1] ** 2
       fmc[cond2] = 32.9 + 3.17 * nd[cond2] - 0.0288 * nd[cond2] ** 2
       fmc[cond3] = 120
+      
 
       return fmc

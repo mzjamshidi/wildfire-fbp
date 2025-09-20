@@ -252,7 +252,7 @@ def drought_code(dc_yesterday: np.ndarray,
       return dc_today
       
 
-def builtup_index(dmc, dc):
+def builtup_index(dmc: np.ndarray, dc: np.ndarray) -> np.ndarray:
      """
      dmc: duff moisture code
      dc: drought code
@@ -269,3 +269,20 @@ def builtup_index(dmc, dc):
      bui[bui < 0] = 0
 
      return bui
+
+def fire_weather_index(isi: np.ndarray, bui: np.ndarray) -> np.ndarray:
+     
+     """Eq. 28, Van Wagner & Pickett 1985"""
+     fD = np.where(bui <= 80,
+                   0.626 * bui ** 0.809 + 2,
+                   1000 / (25 + 108.64 * np.exp(-0.023* bui)))
+     
+     """Eq. 29, Van Wagner & Pickett 1985"""
+     bb = 0.1 * isi * fD
+     bb_safe = np.maximum(bb, 1)    # hack to avoid nan for bb < 1
+
+     """Eq. 30, Van Wagner & Pickett 1985"""
+     fwi = np.where(bb > 1,
+                    np.exp(2.72 * (0.434 * np.log(bb_safe)) ** 0.647),
+                    bb)
+     return fwi

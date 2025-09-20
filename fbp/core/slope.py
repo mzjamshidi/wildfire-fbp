@@ -1,14 +1,13 @@
 import numpy as np
 
 from fbp.constants import FBP_FUEL_MAP
+from .weather import initial_spread_index, _fF_formula
 from .ros import (
     initial_rate_of_spread,
-    initial_spread_index,
     rate_of_spread,
     _cf_formula,
     _get_ros_params_m3,
     _get_ros_params_m4,
-    _fF_formula,
     ROS_PARAMS)
 
 def _slope_factor(gs: np.ndarray) -> np.ndarray:

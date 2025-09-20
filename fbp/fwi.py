@@ -9,7 +9,7 @@ from .core.weather import foliar_moisture_content
 class FWIResults:
     fmc: np.ndarray
 
-class FWI:
+class FWIModel:
     def __init__(self,
                  latitude_south: float,
                  latitude_north: float,

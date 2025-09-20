@@ -1,2 +1,2 @@
-from .fbp import FBP
-from .fwi import FWI
+from .fbp import FBPModel
+from .fwi import FWIModel

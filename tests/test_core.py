@@ -3,9 +3,9 @@ import pandas as pd
 import numpy as np
 
 from fbp.constants import FBP_FUEL_MAP
-from fbp.core.ros import initial_spread_index, rate_of_spread, initial_rate_of_spread, buildup_effect
+from fbp.core.ros import rate_of_spread, initial_rate_of_spread, buildup_effect
 from fbp.core.slope import slope_adjusted_wind_vector
-from fbp.core.weather import foliar_moisture_content, duff_moisture_code, drought_code, builtup_index, fire_weather_index
+from fbp.core.weather import foliar_moisture_content, duff_moisture_code, drought_code, builtup_index, fire_weather_index, initial_spread_index
 
 ref_isi_data = pd.read_csv("tests/data/InitialSpreadIndex.csv").to_dict(orient="records")
 ref_slope_data = pd.read_csv("tests/data/Slope.csv").to_dict(orient="records")

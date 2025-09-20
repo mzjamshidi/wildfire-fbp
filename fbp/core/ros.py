@@ -72,14 +72,14 @@ def _cf_formula(gc: np.ndarray):
                 0.176 + 0.02 * (gc - 58.8)
             )
 
-def _fF_formula(ffmc: np.ndarray):
-    FFMC_COEFFICIENT = 250 * 59.5 / 101
+# def _fF_formula(ffmc: np.ndarray):
+#     FFMC_COEFFICIENT = 250 * 59.5 / 101
     
-    """Eq. 46, FCFDG 1992"""
-    m = FFMC_COEFFICIENT * (101 - ffmc) / (59.5 + ffmc)
+#     """Eq. 46, FCFDG 1992"""
+#     m = FFMC_COEFFICIENT * (101 - ffmc) / (59.5 + ffmc)
 
-    """Eq. 45, FCFDG 1992"""
-    return 91.9 * np.exp(-0.1386 * m) * (1 + (m**5.31) / 4.93e7)
+#     """Eq. 45, FCFDG 1992"""
+#     return 91.9 * np.exp(-0.1386 * m) * (1 + (m**5.31) / 4.93e7)
 
 def initial_rate_of_spread(
         fuel_map: np.ndarray,
@@ -164,23 +164,23 @@ def initial_rate_of_spread(
     return rsi
 
 
-def initial_spread_index(ffmc: np.ndarray, ws: np.ndarray) -> np.ndarray:
-    """
-        ws: wind speed (km/h)
-    """
+# def initial_spread_index(ffmc: np.ndarray, ws: np.ndarray) -> np.ndarray:
+#     """
+#         ws: wind speed (km/h)
+#     """
 
-    fF = _fF_formula(ffmc)
+#     fF = _fF_formula(ffmc)
     
-    """Eqs. 53 & 53a, FCFDG 1992: wsv: net effective wind speed"""
-    fW = np.where(
-        ws <= 40,
-        np.exp(0.05039 * ws),
-        12 * (1 - np.exp(-0.0818 * (ws - 28)))
-    )
+#     """Eqs. 53 & 53a, FCFDG 1992: wsv: net effective wind speed"""
+#     fW = np.where(
+#         ws <= 40,
+#         np.exp(0.05039 * ws),
+#         12 * (1 - np.exp(-0.0818 * (ws - 28)))
+#     )
 
-    """Eq. 52, FCFDG 1992"""
-    isi = 0.208 * fW * fF
-    return isi
+#     """Eq. 52, FCFDG 1992"""
+#     isi = 0.208 * fW * fF
+#     return isi
 
 def buildup_effect(fuel_map: np.ndarray, bui: np.ndarray) -> np.ndarray:
     be = np.zeros_like(fuel_map, dtype=float)

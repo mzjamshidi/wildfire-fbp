@@ -279,10 +279,37 @@ def fire_weather_index(isi: np.ndarray, bui: np.ndarray) -> np.ndarray:
      
      """Eq. 29, Van Wagner & Pickett 1985"""
      bb = 0.1 * isi * fD
-     bb_safe = np.maximum(bb, 1)    # hack to avoid nan for bb < 1
+     bb_safe = np.maximum(bb, 1)    # hack to avoid NaN warnings for bb < 1
 
      """Eq. 30, Van Wagner & Pickett 1985"""
      fwi = np.where(bb > 1,
                     np.exp(2.72 * (0.434 * np.log(bb_safe)) ** 0.647),
                     bb)
      return fwi
+
+def _fF_formula(ffmc: np.ndarray):
+    FFMC_COEFFICIENT = 250 * 59.5 / 101
+    
+    """Eq. 46, FCFDG 1992"""
+    m = FFMC_COEFFICIENT * (101 - ffmc) / (59.5 + ffmc)
+
+    """Eq. 45, FCFDG 1992"""
+    return 91.9 * np.exp(-0.1386 * m) * (1 + (m**5.31) / 4.93e7)
+
+def initial_spread_index(ffmc: np.ndarray, ws: np.ndarray) -> np.ndarray:
+    """
+        ws: wind speed (km/h)
+    """
+
+    fF = _fF_formula(ffmc)
+    
+    """Eqs. 53 & 53a, FCFDG 1992: wsv: net effective wind speed"""
+    fW = np.where(
+        ws <= 40,
+        np.exp(0.05039 * ws),
+        12 * (1 - np.exp(-0.0818 * (ws - 28)))
+    )
+
+    """Eq. 52, FCFDG 1992"""
+    isi = 0.208 * fW * fF
+    return isi

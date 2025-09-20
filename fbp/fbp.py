@@ -3,10 +3,11 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from .core.ros import rate_of_spread, initial_rate_of_spread, initial_spread_index, buildup_effect
+from .core.ros import rate_of_spread, initial_rate_of_spread, buildup_effect
 from .core.slope import slope_adjusted_wind_vector
 from .core.consumption import total_fuel_consumption, surface_fuel_consumption, fire_intensity
 from .core.crowning import crown_fraction_burned, classify_fire_type
+from .core.weather import initial_spread_index
 
 
 @dataclass
@@ -23,7 +24,7 @@ class FBPResults:
     tfc: np.ndarray
 
 
-class FBP:
+class FBPModel:
     def __init__(self,
                  fuel_map: np.ndarray,
                  percent_conifer: np.ndarray | None = None,

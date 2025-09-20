@@ -5,7 +5,7 @@ import numpy as np
 from fbp.constants import FBP_FUEL_MAP
 from fbp.core.ros import initial_spread_index, rate_of_spread, initial_rate_of_spread, buildup_effect
 from fbp.core.slope import slope_adjusted_wind_vector
-from fbp.core.weather import foliar_moisture_content, duff_moisture_code, drought_code
+from fbp.core.weather import foliar_moisture_content, duff_moisture_code, drought_code, builtup_index
 
 ref_isi_data = pd.read_csv("tests/data/InitialSpreadIndex.csv").to_dict(orient="records")
 ref_slope_data = pd.read_csv("tests/data/Slope.csv").to_dict(orient="records")
@@ -13,6 +13,7 @@ ref_rate_of_spread = pd.read_csv("tests/data/RateOfSpread.csv").to_dict(orient="
 ref_folier_moisture_content = pd.read_csv("tests/data/FoliarMoistureContent.csv").to_dict(orient="records")
 ref_duff_moisture_code = pd.read_csv("tests/data/DuffMoistureCode.csv").to_dict(orient="records")
 ref_drought_code = pd.read_csv("tests/data/DroughtCode.csv").to_dict(orient="records")
+ref_buildup_index = pd.read_csv("tests/data/BuildupIndex.csv").to_dict(orient="records")
 
 
 def _to_arr(val, dtype=float):
@@ -122,6 +123,17 @@ def test_drought_code(row):
     ref_dc = row["DroughtCode"]
 
     assert np.isclose(dc, ref_dc, atol=1e-2), f"DC mismatch for row {row}"
+
+@pytest.mark.parametrize("row", ref_buildup_index)
+def test_buildup_index(row):
+    dmc = _to_arr(row["dmc"])
+    dc = _to_arr(row["dc"])
+
+    bui = builtup_index(dmc=dmc, dc=dc)
+
+    ref_bui = row["BuildupIndex"]
+
+    assert np.isclose(bui, ref_bui, atol=1e-2), f"BUI mismatch for row {row}"
 
 # @pytest.mark.parametrize("row", ref_slope_data)
 # def test_slope(row):

@@ -252,11 +252,20 @@ def drought_code(dc_yesterday: np.ndarray,
       return dc_today
       
 
+def builtup_index(dmc, dc):
+     """
+     dmc: duff moisture code
+     dc: drought code
+     """
+     denom = (dmc + 0.4 * dc)
+     safe_denom = np.where(denom == 0, 1e-6, denom)
 
+     """Eq. 27, Van Wagner & Pickett 1985"""
+     bui = np.where((dmc <= 0.4 * dc),
+                    0.8 * dmc * dc / safe_denom,
+                    dmc - (1 - 0.8 * dc / safe_denom) * (0.92 + (0.0114 * dmc) ** 1.7))
+     
+     bui[(dmc == 0) & (dc == 0)] = 0
+     bui[bui < 0] = 0
 
-
-
-
-# TODO
-def builtup_index():
-     raise NotImplementedError
+     return bui

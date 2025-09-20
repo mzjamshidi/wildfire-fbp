@@ -105,12 +105,10 @@ def foliar_moisture_content(latitude: np.ndarray,
 
       return fmc
 
-# TODO
-def builtup_index():
-     raise NotImplementedError
+
 
 """Table 1, Van Wagner & Pickett 1985 & R package"""
-Leff_VALUES = {
+DMC_Leff_VALUES = {
       "46N": [6.5, 7.5, 9, 12.8, 13.9, 13.9, 12.4, 10.9, 9.4, 8, 7, 6],
       "20N": [7.9, 8.4, 8.9, 9.5, 9.9, 10.2, 10.1, 9.7, 9.1, 8.6, 8.1, 7.8],
       "20S": [10.1, 9.6, 9.1, 8.5, 8.1, 7.8, 7.9, 8.3, 8.9, 9.4, 9.9, 10.2],
@@ -124,21 +122,26 @@ def _dmc_effective_day_length(month: int,
      idx = month -1 
 
      if latitude is None:
-          return np.array(Leff_VALUES["46N"][idx], dtype=float)
+          return np.array(DMC_Leff_VALUES["46N"][idx], dtype=float)
      
      Leff = np.full_like(latitude, np.nan, dtype=float)
 
      # These latitude adjustments are based on the R package
      # (corresponding equations not found in the main source)
-     Leff[(latitude >= 30.) & (latitude <= 90.)] = Leff_VALUES["46N"][idx]
-     Leff[(latitude >= 10.) & (latitude <= 30.)] = Leff_VALUES["20N"][idx]
-     Leff[(latitude >= -10.) & (latitude <= 10.)] = Leff_VALUES["0"][idx]
-     Leff[(latitude >= -30.) & (latitude <= -10.)] = Leff_VALUES["20S"][idx]
-     Leff[(latitude >= -90.) & (latitude <= -30.)] = Leff_VALUES["40S"][idx]
+     Leff[(latitude >= 30.) & (latitude <= 90.)] = DMC_Leff_VALUES["46N"][idx]
+     Leff[(latitude >= 10.) & (latitude <= 30.)] = DMC_Leff_VALUES["20N"][idx]
+     Leff[(latitude >= -10.) & (latitude <= 10.)] = DMC_Leff_VALUES["0"][idx]
+     Leff[(latitude >= -30.) & (latitude <= -10.)] = DMC_Leff_VALUES["20S"][idx]
+     Leff[(latitude >= -90.) & (latitude <= -30.)] = DMC_Leff_VALUES["40S"][idx]
 
      return Leff     
 
-def duff_moisture_code(dmc_yesterday: np.ndarray, temp, prec, rh, month, latitude=None):
+def duff_moisture_code(dmc_yesterday: np.ndarray,
+                       temp: np.ndarray,
+                       prec: np.ndarray,
+                       rh: np.ndarray, 
+                       month: int,
+                       latitude: np.ndarray | None = None):
      
      pr = dmc_yesterday.copy()
 
@@ -184,7 +187,76 @@ def duff_moisture_code(dmc_yesterday: np.ndarray, temp, prec, rh, month, latitud
      return dmc_today
 
 
+"""Table 2, Van Wagner & Pickett 1985 & R package"""
+DC_Leff_VALUES = {
+      "20N": [-1.6, -1.6, -1.6, 0.9, 3.8, 5.8, 6.4, 5, 2.4, 0.4, -1.6, -1.6],
+      "20S": [6.4, 5, 2.4, 0.4, -1.6, -1.6, -1.6, -1.6, -1.6, 0.9, 3.8, 5.8],
+      "0": 12 * [1.4]
+}
+
+def _dc_effective_day_length(month: int,
+                             latitude: np.ndarray | None = None):
+      idx = month -1 
+
+      if latitude is None:
+            return np.array(DC_Leff_VALUES["20N"][idx], dtype=float)
+     
+      Leff = np.full_like(latitude, np.nan, dtype=float)
+
+      # These latitude adjustments are based on the R package
+      # (corresponding equations not found in the main source)
+      Leff[(latitude >= 20)] = DC_Leff_VALUES["20N"][idx]
+      Leff[(latitude <= -20)] = DC_Leff_VALUES["20S"][idx]
+      Leff[(latitude < 20) & (latitude > -20)] = DC_Leff_VALUES["0"][idx]
+
+      return Leff   
+
+
+def drought_code(dc_yesterday: np.ndarray,
+                 temp: np.ndarray,
+                 prec: np.ndarray,
+                 month: int,
+                 latitude: np.ndarray | None = None):
+     
+      dr = dc_yesterday.copy()
+      rainy = prec > 2.8
+     
+      if np.any(rainy):
+            ra = prec[rainy]
+            dc_ya = dc_yesterday[rainy]
+
+            """Eq. 18, Van Wagner & Pickett 1985"""
+            rw = 0.83 * ra - 1.27
+            """Eq. 19, Van Wagner & Pickett 1985"""
+            smi = 800 * np.exp(-dc_ya / 400)
+            """Eq. 20, Van Wagner & Pickett 1985 (per R package alterated)"""
+            dr0 = np.where(smi > 0,
+                         dc_ya - 400 * np.log(1 + 3.937 * rw / smi),
+                         0)
+          
+            dr[rainy] = np.maximum(dr0, 0)
+      
+      """Van Wagner & Pickett 1985"""
+      temp = np.maximum(temp, -2.8)
+      
+      Leff = _dc_effective_day_length(month, latitude)
+      
+      """Eq. 22, Van Wagner & Pickett 1985"""
+      pe = 0.36 * (temp + 2.8) + Leff
+      pe = np.maximum(pe, 0)
+
+      """Eq. 23, Van Wagner & Pickett 1985"""
+      dc_today = dr + 0.5 * pe
+      dc_today = np.maximum(dc_today, 0)
+
+      return dc_today
+      
+
+
+
+
+
 
 # TODO
-def drought_code():
+def builtup_index():
      raise NotImplementedError

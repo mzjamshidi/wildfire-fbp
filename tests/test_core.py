@@ -5,12 +5,17 @@ import numpy as np
 from fbp.constants import FBP_FUEL_MAP
 from fbp.core.ros import initial_spread_index, rate_of_spread, initial_rate_of_spread, buildup_effect
 from fbp.core.slope import slope_adjusted_wind_vector
-from fbp.core.weather import foliar_moisture_content
+from fbp.core.weather import foliar_moisture_content, duff_moisture_code
 
 ref_isi_data = pd.read_csv("tests/data/InitialSpreadIndex.csv").to_dict(orient="records")
 ref_slope_data = pd.read_csv("tests/data/Slope.csv").to_dict(orient="records")
 ref_rate_of_spread = pd.read_csv("tests/data/RateOfSpread.csv").to_dict(orient="records")
 ref_folier_moisture_content = pd.read_csv("tests/data/FoliarMoistureContent.csv").to_dict(orient="records")
+ref_duff_moisture_code = pd.read_csv("tests/data/DuffMoistureCode.csv").to_dict(orient="records")
+
+
+def _to_arr(val, dtype=float):
+    return np.asarray(val, dtype=dtype)
 
 @pytest.mark.parametrize("row", ref_isi_data)
 def test_initial_spread_index(row):
@@ -75,6 +80,27 @@ def test_foliar_moisture_content(row):
     ref_fmc = row["FoliarMoistureContent"]
 
     assert np.isclose(fmc, ref_fmc, atol=1), f"FMC mismatch for row {row}"
+
+@pytest.mark.parametrize("row", ref_duff_moisture_code)
+def test_duff_moisture_code(row):
+    dmc_yda = _to_arr(row["dmc_yda"])
+    temp = row["temp"]
+    rh = _to_arr(row["rh"])
+    prec = _to_arr(row["prec"])
+    lat = _to_arr(row["lat"])
+    mon = row["mon"]
+    lat_adj = _to_arr(row["lat.adjust"])
+    lat = lat if lat_adj else None
+
+    dmc = duff_moisture_code(dmc_yesterday=dmc_yda,
+                             temp=temp,
+                             rh=rh,
+                             prec=prec,
+                             latitude=lat,
+                             month=mon)
+    
+    ref_dmc = row["DuffMoistureCode"]
+    assert np.isclose(dmc, ref_dmc, atol=1e-2), f"DMC mismatch for row {row}"
 
 # @pytest.mark.parametrize("row", ref_slope_data)
 # def test_slope(row):

@@ -104,3 +104,87 @@ def foliar_moisture_content(latitude: np.ndarray,
       
 
       return fmc
+
+# TODO
+def builtup_index():
+     raise NotImplementedError
+
+"""Table 1, Van Wagner & Pickett 1985 & R package"""
+Leff_VALUES = {
+      "46N": [6.5, 7.5, 9, 12.8, 13.9, 13.9, 12.4, 10.9, 9.4, 8, 7, 6],
+      "20N": [7.9, 8.4, 8.9, 9.5, 9.9, 10.2, 10.1, 9.7, 9.1, 8.6, 8.1, 7.8],
+      "20S": [10.1, 9.6, 9.1, 8.5, 8.1, 7.8, 7.9, 8.3, 8.9, 9.4, 9.9, 10.2],
+      "40S": [11.5, 10.5, 9.2, 7.9, 6.8, 6.2, 6.5, 7.4, 8.7, 10, 11.2, 11.8],
+      "0": 12 * [9]
+}
+
+def _dmc_effective_day_length(month: int,
+                              latitude: np.ndarray | None =None) -> np.ndarray:
+     
+     idx = month -1 
+
+     if latitude is None:
+          return np.array(Leff_VALUES["46N"][idx], dtype=float)
+     
+     Leff = np.full_like(latitude, np.nan, dtype=float)
+
+     # These latitude adjustments are based on the R package
+     # (corresponding equations not found in the main source)
+     Leff[(latitude >= 30.) & (latitude <= 90.)] = Leff_VALUES["46N"][idx]
+     Leff[(latitude >= 10.) & (latitude <= 30.)] = Leff_VALUES["20N"][idx]
+     Leff[(latitude >= -10.) & (latitude <= 10.)] = Leff_VALUES["0"][idx]
+     Leff[(latitude >= -30.) & (latitude <= -10.)] = Leff_VALUES["20S"][idx]
+     Leff[(latitude >= -90.) & (latitude <= -30.)] = Leff_VALUES["40S"][idx]
+
+     return Leff     
+
+def duff_moisture_code(dmc_yesterday: np.ndarray, temp, prec, rh, month, latitude=None):
+     
+     pr = dmc_yesterday.copy()
+
+     rainy = prec > 1.5
+     if np.any(rainy):
+          ra = prec[rainy]
+          dmc_r = dmc_yesterday[rainy]
+          """Eq. 11, Van Wagner & Pickett 1985"""
+          rw = 0.92 * ra - 1.27
+          """Eq. 12, Van Wagner & Pickett 1985 (per R package alterated to calculate more accurately)"""
+          wmi = 20 + 280 / np.exp(0.023 * dmc_r)
+
+          b = np.full_like(dmc_r, np.nan, dtype=float)
+          
+          """Eq. 13, Van Wagner & Pickett 1985"""
+          cond1 = dmc_r <= 33
+          cond2 = (dmc_r > 33) & (dmc_r <= 65)
+          cond3 = dmc_r > 65
+          
+          b[cond1] = 100 / (0.5 + 0.3 * dmc_r[cond1])
+          b[cond2] = 14 - 1.3 * np.log(dmc_r[cond2])
+          b[cond3] = 6.2 * np.log(dmc_r[cond3]) - 17.2
+          
+          """Eq. 14, Van Wagner & Pickett 1985"""
+          wmr = wmi + 1000 * rw / (48.77 + b * rw)
+          
+          """Eq. 15, Van Wagner & Pickett 1985 (per R package alterated to calculate more accurately)"""
+          pr[rainy] = 43.43 * (5.6348 - np.log(wmr - 20))
+      
+     pr = np.maximum(pr, 0)
+     
+     """Van Wagner & Pickett 1985"""
+     temp = np.maximum(temp, -1.1)
+     
+     Leff = _dmc_effective_day_length(month, latitude)
+     
+     """Eq. 16, Van Wagner & Pickett 1985"""
+     rk = 1.894 * (temp + 1.1) * (100 - rh) * Leff * 1e-6
+
+     """Eq. 17, Van Wagner & Pickett 1985"""
+     dmc_today = pr + 100 * rk
+
+     return dmc_today
+
+
+
+# TODO
+def drought_code():
+     raise NotImplementedError

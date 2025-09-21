@@ -59,7 +59,7 @@ def surface_fuel_consumption(
         percent_conifer_map: np.ndarray | None = None,
         grass_fuel_load: float = 0.3):
 
-    sfc = np.full_like(bui, np.nan, dtype=float)
+    sfc = np.zeros_like(bui, dtype=float)
 
     # --- C1 ---
     mask = get_fuel_mask(fuel_map, ["C1"])

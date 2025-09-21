@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from .fbp import FBPResults
+from .models.fbp import FBPResults
 
 def plot_fire_intensity(results: FBPResults, extent=None):
     fig, ax = plt.subplots()

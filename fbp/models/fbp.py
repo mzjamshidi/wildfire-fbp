@@ -3,11 +3,11 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from .core.ros import rate_of_spread, initial_rate_of_spread, buildup_effect
-from .core.slope import slope_adjusted_wind_vector
-from .core.consumption import total_fuel_consumption, surface_fuel_consumption, fire_intensity
-from .core.crowning import crown_fraction_burned, classify_fire_type
-from .core.weather import initial_spread_index
+from fbp.core.ros import rate_of_spread, initial_rate_of_spread, buildup_effect
+from fbp.core.slope import slope_adjusted_wind_vector
+from fbp.core.consumption import total_fuel_consumption, surface_fuel_consumption, fire_intensity
+from fbp.core.crowning import crown_fraction_burned, classify_fire_type
+from fbp.core.weather import initial_spread_index
 
 
 @dataclass
@@ -89,7 +89,7 @@ class FBPModel:
             percent_conifer_map=self.percent_conifer
         )
 
-        # TODO this need not to be done if ther is not conifer fuel
+        # TODO this need not to be done if there is not conifer fuel
         cfb = crown_fraction_burned(
             rate_of_spread=ros,
             folier_moisture_content=self._fmc,

@@ -3,7 +3,14 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from .core.weather import foliar_moisture_content, builtup_index, duff_moisture_code, drought_code, fine_fuel_moisture_code, initial_spread_index, fire_weather_index
+from fbp.core.weather import (
+    foliar_moisture_content, 
+    builtup_index, 
+    duff_moisture_code, 
+    drought_code, 
+    fine_fuel_moisture_code, 
+    initial_spread_index, 
+    fire_weather_index)
 
 @dataclass
 class FWIResults:

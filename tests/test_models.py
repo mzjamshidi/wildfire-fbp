@@ -4,7 +4,7 @@ from datetime import datetime
 import numpy as np
 import pandas as pd
 
-from fbp import FWIModel
+from fbp.models import FWIModel
 
 
 def test_fwi_van_wagner_calibration():

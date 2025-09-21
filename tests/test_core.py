@@ -5,11 +5,14 @@ import numpy as np
 from fbp.constants import FBP_FUEL_MAP
 from fbp.core.ros import rate_of_spread, initial_rate_of_spread, buildup_effect
 from fbp.core.slope import slope_adjusted_wind_vector
+from fbp.core.consumption import surface_fuel_consumption
 from fbp.core.weather import foliar_moisture_content, duff_moisture_code, drought_code, builtup_index, fire_weather_index, initial_spread_index, fine_fuel_moisture_code
 
-ref_isi_data = pd.read_csv("tests/data/InitialSpreadIndex.csv").to_dict(orient="records")
 ref_slope_data = pd.read_csv("tests/data/Slope.csv").to_dict(orient="records")
 ref_rate_of_spread = pd.read_csv("tests/data/RateOfSpread.csv").to_dict(orient="records")
+ref_surface_fuel_consumption = pd.read_csv("tests/data/SurfaceFuelConsumption.csv").to_dict(orient="records")
+
+ref_isi_data = pd.read_csv("tests/data/InitialSpreadIndex.csv").to_dict(orient="records")
 ref_folier_moisture_content = pd.read_csv("tests/data/FoliarMoistureContent.csv").to_dict(orient="records")
 ref_duff_moisture_code = pd.read_csv("tests/data/DuffMoistureCode.csv").to_dict(orient="records")
 ref_drought_code = pd.read_csv("tests/data/DroughtCode.csv").to_dict(orient="records")
@@ -18,8 +21,15 @@ ref_fire_weather_index = pd.read_csv("tests/data/FireWeatherIndex.csv").to_dict(
 ref_fine_fuel_moisture_code = pd.read_csv("tests/data/FineFuelMoistureCode.csv").to_dict(orient="records")
 
 
+
 def _to_arr(val, dtype=float):
     return np.asarray(val, dtype=dtype)
+
+def _fuel_code(fuel_code):
+    return fuel_code[0].upper() + fuel_code[1:].lower()
+
+def _to_fuel_id(fuel_code):
+    return _to_arr(FBP_FUEL_MAP.get(fuel_code, 0), dtype=int)
 
 @pytest.mark.parametrize("row", ref_isi_data)
 def test_initial_spread_index(row):
@@ -64,6 +74,28 @@ def test_rate_of_spread(row):
         f"computed={ros}, reference={ref_ros}"
     )
 
+@pytest.mark.parametrize("row", ref_surface_fuel_consumption)
+def test_surface_fuel_consumption(row):
+    fuel_code = _fuel_code(row["FUELTYPE"])
+    ffmc = _to_arr(row["FFMC"])
+    bui = _to_arr(row["BUI"])
+    pc = _to_arr(row["PC"])
+    gfl = row["GFL"]
+
+    sfc = surface_fuel_consumption(fuel_map=_to_fuel_id(fuel_code),
+                                   bui=bui,
+                                   ffmc=ffmc,
+                                   percent_conifer_map=pc,
+                                   grass_fuel_load=gfl)
+    
+    ref_sfc = row["SurfaceFuelConsumption"]
+
+    if not np.isclose(sfc, ref_sfc, atol=1e-2):
+        breakpoint()
+
+    assert np.isclose(sfc, ref_sfc, atol=1e-2), f"BUI mismatch: got {sfc}, expected {ref_sfc}"
+
+# --- WEATHER Code ---
 @pytest.mark.parametrize("row", ref_fine_fuel_moisture_code)
 def test_fine_fuel_moisture_code(row):
     ffmc_yda = _to_arr(row["ffmc_yda"])

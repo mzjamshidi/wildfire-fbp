@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from .core.weather import foliar_moisture_content, builtup_index, duff_moisture_code, drought_code
+from .core.weather import foliar_moisture_content, builtup_index, duff_moisture_code, drought_code, fine_fuel_moisture_code, initial_spread_index, fire_weather_index
 
 @dataclass
 class FWIResults:
@@ -11,6 +11,9 @@ class FWIResults:
     dmc_today: np.ndarray
     dc_today: np.ndarray
     bui_today: np.ndarray
+    ffmc_today: np.ndarray
+    isi_today: np.ndarray
+    fwi_today: np.ndarray
 
 class FWIModel:
     def __init__(self,
@@ -37,18 +40,22 @@ class FWIModel:
             return attr
 
     def run(self, date: str | datetime,
+            wind_speed: float | np.ndarray,
             temperature: float | np.ndarray,
             precipitation: float | np.ndarray,
             relative_humidity: float | np.ndarray,
             drought_code_yesterday: float | np.ndarray,
-            duff_moisture_code_yesterday: float | np.ndarray
+            duff_moisture_code_yesterday: float | np.ndarray,
+            fine_fuel_moisture_code_yesterday: float | np.ndarray
             ) -> FWIResults:
         
+        self._wind_speed = self._to_array(wind_speed)
         self._temperature = self._to_array(temperature)
         self._precipitation = self._to_array(precipitation)
         self._relative_humidity = self._to_array(relative_humidity)
         self._drought_code_yesterday = self._to_array(drought_code_yesterday)
         self._duff_moisture_code_yesterday = self._to_array(duff_moisture_code_yesterday) 
+        self._fine_fuel_moisture_code_yesterday = self._to_array(fine_fuel_moisture_code_yesterday)
 
         
         if isinstance(date, str):
@@ -73,9 +80,22 @@ class FWIModel:
                                  month=date.month,
                                  latitude=self.lat_arr)
         bui = builtup_index(dmc, dc)
+
+        ffmc = fine_fuel_moisture_code(ffmc_yesterday=self._fine_fuel_moisture_code_yesterday,
+                                       temp=self._temperature,
+                                       rh=self._relative_humidity,
+                                       ws=self._wind_speed,
+                                       prec=self._precipitation)
+        
+        isi = initial_spread_index(ffmc=ffmc, ws=self._wind_speed)
+
+        fwi = fire_weather_index(isi=isi, bui=bui)
         
         results = FWIResults(fmc=fmc,
                              bui_today=bui,
                              dmc_today=dmc,
-                             dc_today=dc)
+                             dc_today=dc,
+                             ffmc_today=ffmc,
+                             isi_today=isi,
+                             fwi_today=fwi)
         return results

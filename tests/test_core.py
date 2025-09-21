@@ -5,7 +5,7 @@ import numpy as np
 from fbp.constants import FBP_FUEL_MAP
 from fbp.core.ros import rate_of_spread, initial_rate_of_spread, buildup_effect
 from fbp.core.slope import slope_adjusted_wind_vector
-from fbp.core.weather import foliar_moisture_content, duff_moisture_code, drought_code, builtup_index, fire_weather_index, initial_spread_index
+from fbp.core.weather import foliar_moisture_content, duff_moisture_code, drought_code, builtup_index, fire_weather_index, initial_spread_index, fine_fuel_moisture_code
 
 ref_isi_data = pd.read_csv("tests/data/InitialSpreadIndex.csv").to_dict(orient="records")
 ref_slope_data = pd.read_csv("tests/data/Slope.csv").to_dict(orient="records")
@@ -15,6 +15,7 @@ ref_duff_moisture_code = pd.read_csv("tests/data/DuffMoistureCode.csv").to_dict(
 ref_drought_code = pd.read_csv("tests/data/DroughtCode.csv").to_dict(orient="records")
 ref_buildup_index = pd.read_csv("tests/data/BuildupIndex.csv").to_dict(orient="records")
 ref_fire_weather_index = pd.read_csv("tests/data/FireWeatherIndex.csv").to_dict(orient="records")
+ref_fine_fuel_moisture_code = pd.read_csv("tests/data/FineFuelMoistureCode.csv").to_dict(orient="records")
 
 
 def _to_arr(val, dtype=float):
@@ -62,6 +63,26 @@ def test_rate_of_spread(row):
         f"Rate of spread mismatch for fuel '{fuel}': "
         f"computed={ros}, reference={ref_ros}"
     )
+
+@pytest.mark.parametrize("row", ref_fine_fuel_moisture_code)
+def test_fine_fuel_moisture_code(row):
+    ffmc_yda = _to_arr(row["ffmc_yda"])
+    temp = _to_arr(row["temp"])
+    rh = _to_arr(row["rh"])
+    ws = _to_arr(row["ws"])
+    prec = _to_arr(row["prec"])
+
+    ffmc = fine_fuel_moisture_code(ffmc_yesterday=ffmc_yda,
+                                   temp=temp,
+                                   rh=rh,
+                                   prec=prec,
+                                   ws=ws)
+    
+    ref_ffmc = row["FineFuelMoistureCode"]
+
+    assert np.allclose(
+            ffmc, ref_ffmc, atol=1e-2, equal_nan=True
+        ), f"BUI mismatch: got {ffmc}, expected {ref_ffmc}"
 
 @pytest.mark.parametrize("row", ref_folier_moisture_content)
 def test_foliar_moisture_content(row):

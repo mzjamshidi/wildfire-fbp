@@ -5,7 +5,7 @@ import numpy as np
 from fbp.constants import FBP_FUEL_MAP
 from fbp.core.ros import rate_of_spread, initial_rate_of_spread, buildup_effect
 from fbp.core.slope import slope_adjusted_wind_vector
-from fbp.core.consumption import surface_fuel_consumption
+from fbp.core.consumption import surface_fuel_consumption, crown_fuel_consumption, total_fuel_consumption
 from fbp.core.weather import foliar_moisture_content, duff_moisture_code, drought_code, builtup_index, fire_weather_index, initial_spread_index, fine_fuel_moisture_code
 
 ref_slope_data = pd.read_csv("tests/data/Slope.csv").to_dict(orient="records")
@@ -90,10 +90,7 @@ def test_surface_fuel_consumption(row):
     
     ref_sfc = row["SurfaceFuelConsumption"]
 
-    if not np.isclose(sfc, ref_sfc, atol=1e-2):
-        breakpoint()
-
-    assert np.isclose(sfc, ref_sfc, atol=1e-2), f"BUI mismatch: got {sfc}, expected {ref_sfc}"
+    assert np.isclose(sfc, ref_sfc, atol=1e-2), f"SFC mismatch: got {sfc}, expected {ref_sfc}"
 
 # --- WEATHER Code ---
 @pytest.mark.parametrize("row", ref_fine_fuel_moisture_code)
